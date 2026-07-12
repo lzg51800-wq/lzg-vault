@@ -1,0 +1,26 @@
+执行「AI 周刊自动生成」任务，严格按以下步骤操作：
+
+1. 用 web search（Tavily）搜集本周（过去 7 天）AI / 科技领域最重要的新闻。挑选 8 条最有价值的，尽量覆盖以下分类：模型、政策、资本、产品、终端。
+
+2. 对每条新闻，整理为如下 JSON 对象（字段名和类型必须一致）：
+{
+  "id": 1,
+  "category": "模型",        // 取值之一：模型 / 政策 / 资本 / 产品 / 终端
+  "title": "新闻标题",
+  "date": "2026-07-12",      // 事件日期 YYYY-MM-DD，或区间 "2026-07-04 ~ 07-08"
+  "summary": "2-3 句中文摘要",
+  "source": "信息来源",
+  "impact": "高",            // 取值之一：高 / 中 / 低
+  "tag": ["标签1", "标签2"]
+}
+把 8 条放进一个 JSON 数组，写文件 /home/ubuntu/ai-weekly/news.json（UTF-8，标准 JSON 数组，不要有任何额外文字或 markdown 代码块标记）。
+
+3. 运行命令生成网页：
+   cd /home/ubuntu/ai-weekly && python3 render_ai_weekly.py
+   如果脚本报错（字段缺失/类型错误），根据报错修正 news.json 后重试，直到输出 "index.html generated"。
+
+4. 运行命令上传到 COS：
+   bash /home/ubuntu/ai-weekly/upload.sh
+   确认输出包含 "已上传"。
+
+5. 简要回复：本次生成几条、上传是否成功。
