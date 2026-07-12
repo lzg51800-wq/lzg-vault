@@ -36,3 +36,9 @@
 - 金融笔记文件夹：`💰金融/`
 - AI 配置文件夹：`🤖AI/`
 - 龙虾配置文件：`🤖AI/龙虾定时任务配置.md`
+- 知识库结构：`Templates/`（每日/概念/文献 3 套 Templater 模板）、`Inbox/`（碎片箱）、各主题区有 `MOC-xx.md`（已接 Dataview 动态汇总）
+- **层级标签体系**（新笔记必须沿用，MOC 靠它自动汇总）：
+  - 金融：`金融/{A股|新闻简报|重大事件|个股|宏观|策略}`
+  - AI：`AI/{架构|部署|自动化|飞书|模型|工作记录}`
+- Git 备份：vault 已 `git init` + GitHub remote `git@github.com:lzg51800-wq/lzg-vault.git`，Obsidian Git 每 30 分钟自动 commit+push
+- MOC 用法：新笔记打对应层级标签即自动出现在 MOC 的 Dataview 区；重点笔记可手动加到「⭐精选」区
