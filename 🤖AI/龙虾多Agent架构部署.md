@@ -1,3 +1,9 @@
+---
+tags:
+  - AI/架构
+created: 2026-07-12
+---
+
 # OpenClaw 多 Agent 架构部署指南
 
 > 主 Agent 调度子 Agent 模式 | 部署日期：2026-07-12
