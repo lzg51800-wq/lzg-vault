@@ -40,7 +40,7 @@
 - **层级标签体系**（新笔记必须沿用，MOC 靠它自动汇总）：
   - 金融：`金融/{A股|新闻简报|重大事件|个股|宏观|策略}`
   - AI：`AI/{架构|部署|自动化|飞书|模型|工作记录}`
-- Git 备份：vault 已 `git init` + GitHub remote `git@github.com:lzg51800-wq/lzg-vault.git`，Obsidian Git 每 30 分钟自动 commit+push
+- Git 备份：vault 已 `git init` + GitHub remote（**2026-07-13 改 HTTPS**：`https://github.com/lzg51800-wq/lzg-vault.git`，因 Mac Clash Verge TUN 拦截 SSH 22 端口；Mac keychain 已缓存 token，Obsidian Git 自动备份恢复 ✅），Obsidian Git 每 30 分钟自动 commit+push
 - MOC 用法：新笔记打对应层级标签即自动出现在 MOC 的 Dataview 区；重点笔记可手动加到「⭐精选」区
 
 ## 跨工具数据环路（Codex · Obsidian · 飞书 · 龙虾）
@@ -53,4 +53,4 @@
   - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘+版本化）；2 介质 + 1 异地（GitHub）
   - 注意：极空间与 Mac 同处本地，非真正异地副本，主防 Mac 磁盘损坏/误删；真异地仍是 GitHub
   - 接入方式（待实施）：极空间装 git 或 Docker 跑 cron 每天 `git pull` `lzg-vault`（用独立只读 deploy key，不用 Mac 的 github_key）
-- **当前状态（2026-07-13）**：第一步「龙虾→GitHub→Obsidian」半环已实施并端到端验证通过；Mac 代理拦截 SSH 问题已用方案1（git remote 改 HTTPS）修复，Obsidian Git 自动备份恢复 ✅；下一步待做：① Codex 加工→回流龙虾 完整闭环；② 极空间 NAS 第 3 备份接入
+- **当前状态（2026-07-13 20:30）**：第一步「龙虾→GitHub→Obsidian」半环已实施并端到端验证通过；Mac 代理拦截 SSH 问题已用方案1（git remote 改 HTTPS）修复，Obsidian Git 自动备份恢复 ✅；第二步 Codex 回流「本地侧」已就绪（建 💰金融/Codex产出/ + Codex指令模板，已推 GitHub d07e311）；服务器侧两步（龙虾 pull 读回 + 极空间只读镜像）待实施，阻塞于 ssh lobster 被 Clash Verge TUN 拦截，需用户临时关 TUN 或网页终端代跑
