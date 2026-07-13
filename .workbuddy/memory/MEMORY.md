@@ -52,5 +52,5 @@
 - **极空间 NAS 备份（2026-07-13 新增）**：用户有本地极空间，作为第 3 副本挂 GitHub 侧做**只读定时 git 镜像**（不参与实时写入，零冲突）
   - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘+版本化）；2 介质 + 1 异地（GitHub）
   - 注意：极空间与 Mac 同处本地，非真正异地副本，主防 Mac 磁盘损坏/误删；真异地仍是 GitHub
-  - 接入方式（待实施）：极空间装 git 或 Docker 跑 cron 每天 `git pull` `lzg-vault`（用独立只读 deploy key，不用 Mac 的 github_key）
-- **当前状态（2026-07-13 20:30）**：第一步「龙虾→GitHub→Obsidian」半环已实施并端到端验证通过；Mac 代理拦截 SSH 问题已用方案1（git remote 改 HTTPS）修复，Obsidian Git 自动备份恢复 ✅；第二步 Codex 回流「本地侧」已就绪（建 💰金融/Codex产出/ + Codex指令模板，已推 GitHub d07e311）；服务器侧两步（龙虾 pull 读回 + 极空间只读镜像）待实施，阻塞于 ssh lobster 被 Clash Verge TUN 拦截，需用户临时关 TUN 或网页终端代跑
+  - 接入方式（部分实施）：服务器已生成只读 deploy key `id_ed25519_lzgvault_ro`（Comment=lzgvault-readonly-jizone）；公钥待用户加 GitHub（Title=`jizone-nas`，不勾写权限）；极空间侧需用户按设备型号执行首次 clone + 定时 git pull（详见 `🤖AI/极空间NAS备份.md`，已推 GitHub）
+- **当前状态（2026-07-13 20:4x）**：环路全面打通 ✅。① 龙虾产出→GitHub→Obsidian 自动拉取 ✅；② Codex 加工写回 vault ✅（已跑首次加工 `Codex观点-2026-07-13.md`）；③ Obsidian Git 备份上云 ✅；④ 龙虾读回 Codex 观点 ✅（主 agent SOUL.md 加「知识总线」章节 + `~/lzg-vault` 已 pull 到 Codex 观点，下次唤醒生效）；⑤ 极空间镜像：只读 key 已生成、本地文档已就绪，待用户在 GitHub 加公钥 + 极空间设备执行 clone/cron。完整 3-2-1 闭环已成
