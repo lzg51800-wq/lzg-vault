@@ -42,3 +42,15 @@
   - AI：`AI/{架构|部署|自动化|飞书|模型|工作记录}`
 - Git 备份：vault 已 `git init` + GitHub remote `git@github.com:lzg51800-wq/lzg-vault.git`，Obsidian Git 每 30 分钟自动 commit+push
 - MOC 用法：新笔记打对应层级标签即自动出现在 MOC 的 Dataview 区；重点笔记可手动加到「⭐精选」区
+
+## 跨工具数据环路（Codex · Obsidian · 飞书 · 龙虾）
+- 设计目标：把本地（Codex+Obsidian）与云端（龙虾 OpenClaw）通过 GitHub 仓库 `lzg-vault` 打通成闭环
+- **知识总线 = GitHub `lzg-vault`**：Obsidian vault 是本地 md 文件已同步；龙虾在腾讯云 `git clone` 同一仓库即可读写同一份知识
+- 环路流向：龙虾 cron 产出简报 → 写 md 进 vault + git push → Obsidian Git 自动 pull 进本地 → Codex 读 vault 深加工写回 → 龙虾定时 pull 读加工结果 → 飞书贯穿当遥控器（发指令/收推送）
+- **分区避冲突**：龙虾只写专属子目录（如 `💰金融/自动/`），其余由用户/Codex 写；两端都 pull-before-push
+- **Codex 外挂 Obsidian**：vault = 本地文件，Codex 直接文件系统读写即可（零配置）；结构化 MCP 需先开 Obsidian「Local REST API」插件
+- **极空间 NAS 备份（2026-07-13 新增）**：用户有本地极空间，作为第 3 副本挂 GitHub 侧做**只读定时 git 镜像**（不参与实时写入，零冲突）
+  - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘+版本化）；2 介质 + 1 异地（GitHub）
+  - 注意：极空间与 Mac 同处本地，非真正异地副本，主防 Mac 磁盘损坏/误删；真异地仍是 GitHub
+  - 接入方式（待实施）：极空间装 git 或 Docker 跑 cron 每天 `git pull` `lzg-vault`（用独立只读 deploy key，不用 Mac 的 github_key）
+- 当前状态：架构已设计（含图），尚未开始实施；第一步拟先做「龙虾→GitHub→Obsidian」半环
