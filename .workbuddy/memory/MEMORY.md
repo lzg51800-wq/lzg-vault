@@ -53,4 +53,4 @@
   - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘+版本化）；2 介质 + 1 异地（GitHub）
   - 注意：极空间与 Mac 同处本地，非真正异地副本，主防 Mac 磁盘损坏/误删；真异地仍是 GitHub
   - 接入方式（待实施）：极空间装 git 或 Docker 跑 cron 每天 `git pull` `lzg-vault`（用独立只读 deploy key，不用 Mac 的 github_key）
-- 当前状态：架构已设计（含图），尚未开始实施；第一步拟先做「龙虾→GitHub→Obsidian」半环
+- **当前状态（2026-07-13）**：第一步「龙虾→GitHub→Obsidian」半环已实施并端到端验证通过；Mac 代理拦截 SSH 问题已用方案1（git remote 改 HTTPS）修复，Obsidian Git 自动备份恢复 ✅；下一步待做：① Codex 加工→回流龙虾 完整闭环；② 极空间 NAS 第 3 备份接入
