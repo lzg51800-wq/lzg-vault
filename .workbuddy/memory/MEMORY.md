@@ -49,8 +49,10 @@
 - 环路流向：龙虾 cron 产出简报 → 写 md 进 vault + git push → Obsidian Git 自动 pull 进本地 → Codex 读 vault 深加工写回 → 龙虾定时 pull 读加工结果 → 飞书贯穿当遥控器（发指令/收推送）
 - **分区避冲突**：龙虾只写专属子目录（如 `💰金融/自动/`），其余由用户/Codex 写；两端都 pull-before-push
 - **Codex 外挂 Obsidian**：vault = 本地文件，Codex 直接文件系统读写即可（零配置）；结构化 MCP 需先开 Obsidian「Local REST API」插件
-- **极空间 NAS 备份（2026-07-13 新增）**：用户有本地极空间，作为第 3 副本挂 GitHub 侧做**只读定时 git 镜像**（不参与实时写入，零冲突）
-  - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘+版本化）；2 介质 + 1 异地（GitHub）
+- **极空间 NAS 备份（2026-07-13 新增）**：用户有本地极空间，作为第 3 副本（不参与实时写入，零冲突）
+  - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘）；2 介质 + 1 异地（GitHub）
   - 注意：极空间与 Mac 同处本地，非真正异地副本，主防 Mac 磁盘损坏/误删；真异地仍是 GitHub
-  - 接入方式（部分实施）：服务器已生成只读 deploy key `id_ed25519_lzgvault_ro`（Comment=lzgvault-readonly-jizone）；公钥待用户加 GitHub（Title=`jizone-nas`，不勾写权限）；极空间侧需用户按设备型号执行首次 clone + 定时 git pull（详见 `🤖AI/极空间NAS备份.md`，已推 GitHub）
-- **当前状态（2026-07-13 20:4x）**：环路全面打通 ✅。① 龙虾产出→GitHub→Obsidian 自动拉取 ✅；② Codex 加工写回 vault ✅（已跑首次加工 `Codex观点-2026-07-13.md`）；③ Obsidian Git 备份上云 ✅；④ 龙虾读回 Codex 观点 ✅（主 agent SOUL.md 加「知识总线」章节 + `~/lzg-vault` 已 pull 到 Codex 观点，下次唤醒生效）；⑤ 极空间镜像：只读 key 已生成、本地文档已就绪，待用户在 GitHub 加公钥 + 极空间设备执行 clone/cron。完整 3-2-1 闭环已成
+  - **挂载方式（2026-07-13 21:2x 升级为 SMB 优先）**：原「自动挂载为磁盘」= 极空间客户端基于"临时缓存目录"(/Users/Apple/Downloads) 生成的 NFS 挂载点 ZSPACE，路径可能随缓存目录设置变化，**不可写死**（用户提醒）。改用 **SMB 固定挂载**：`极空间.local` 被客户端映射成 127.0.0.1，故**只能用 IP `192.168.1.251` 连 SMB**（445 端口已确认可达）；共享名按实际（疑似 `极空间-个人`），本地挂载点 `/Volumes/极空间-个人`。路径稳定、不依赖客户端缓存机制、适合大量文件
+  - **自动同步（2026-07-13 21:2x 实测 OK）**：rsync 脚本 `~/.workbuddy/scripts/sync_jizone.sh` + launchd `~/Library/LaunchAgents/com.lzg.jizone-sync.plist`，每天 23:00（RunAtLoad 加载即跑）。**SMB 优先**：查 `/Volumes/极空间-个人` → 扫 /Volumes 极空间相关 → 尝试 `mount_smbfs`（靠钥匙串已存 192.168.1.251 凭证自动挂）→ fallback 极空间 NFS 动态检测。排除 `.git`/`.DS_Store`/`._*`，保留全部内容+隐藏配置。未挂载则跳过弹通知。日志 `~/.workbuddy/logs/jizone-sync.log`。⚠️ 首次需用户在 Finder 连一次 SMB 并"记住密码"到钥匙串，自动 mount 才无需手输
+  - GitHub 只读 deploy key 镜像方案保留为进阶备选（未实施）
+- **当前状态（2026-07-13 21:13）**：跨工具数据环路全面打通 + 3-2-1 备份完整。① 龙虾产出→GitHub→Obsidian 自动拉取 ✅；② Codex 加工写回 vault ✅；③ Obsidian Git 备份上云 ✅；④ 龙虾读回 Codex 观点 ✅（SOUL.md 已改 + 数据就位）；⑤ 极空间第 3 副本 ✅（已升级为每天 23:00 自动 rsync 同步）。后续可升级：GitHub 只读镜像版本化（可选）。
