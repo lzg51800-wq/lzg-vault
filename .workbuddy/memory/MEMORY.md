@@ -49,10 +49,9 @@
 - 环路流向：龙虾 cron 产出简报 → 写 md 进 vault + git push → Obsidian Git 自动 pull 进本地 → Codex 读 vault 深加工写回 → 龙虾定时 pull 读加工结果 → 飞书贯穿当遥控器（发指令/收推送）
 - **分区避冲突**：龙虾只写专属子目录（如 `💰金融/自动/`），其余由用户/Codex 写；两端都 pull-before-push
 - **Codex 外挂 Obsidian**：vault = 本地文件，Codex 直接文件系统读写即可（零配置）；结构化 MCP 需先开 Obsidian「Local REST API」插件
-- **极空间 NAS 备份（2026-07-13 新增）**：用户有本地极空间，作为第 3 副本（不参与实时写入，零冲突）
-  - 备份拓扑 = 3-2-1：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地+版本化）/ 副本3 极空间 NAS（本地独立磁盘）；2 介质 + 1 异地（GitHub）
-  - 注意：极空间与 Mac 同处本地，非真正异地副本，主防 Mac 磁盘损坏/误删；真异地仍是 GitHub
-  - **挂载方式（最终方案：SMB 已挂载点优先 + NFS 兜底）**：用户已手动通过 Finder ⌘K 连接 SMB：`smb://192.168.1.251/nvme12-181XXXX1800b` → 挂载到 `/Volumes/nvme12-181XXXX1800b`；该卷下有 `LzgFile-Backup`（用户确认）。脚本**只检测已挂载的盘，绝不脚本内自动挂载**（避免 `mount_smbfs` 认证失败、SMB 卡死连带影响 NFS 等风险）。检测顺序：① SMB 已挂载点（`/Volumes` 下 `smbfs`）→ ② 极空间客户端 NFS 挂载点 `Downloads/ZSPACE` → ③ `/Volumes` 兜底扫描；找到 `LzgFile-Backup` 即同步，找不到跳过并弹通知。若 SMB 断开，可重新在 Finder 连 SMB 或开启极空间客户端「自动挂载为磁盘」恢复 NFS 路径
-  - **自动同步（2026-07-13 21:55 已实测 OK）**：rsync 脚本 `~/.workbuddy/scripts/sync_jizone.sh` + launchd `~/Library/LaunchAgents/com.lzg.jizone-sync.plist`，每天 23:00（RunAtLoad 加载即跑一次）。排除 `.git`/`.DS_Store`/`._*`，保留全部内容+隐藏配置（.obsidian/.workbuddy 等）。日志：`~/.workbuddy/logs/jizone-sync.log`。
-  - GitHub 只读 deploy key 镜像方案保留为进阶备选（未实施）
-- **当前状态（2026-07-13 21:13）**：跨工具数据环路全面打通 + 3-2-1 备份完整。① 龙虾产出→GitHub→Obsidian 自动拉取 ✅；② Codex 加工写回 vault ✅；③ Obsidian Git 备份上云 ✅；④ 龙虾读回 Codex 观点 ✅（SOUL.md 已改 + 数据就位）；⑤ 极空间第 3 副本 ✅（已升级为每天 23:00 自动 rsync 同步）。后续可升级：GitHub 只读镜像版本化（可选）。
+  - **第 3 备份方案变迁（2026-07-13）**：先实施极空间 NAS（SMB/NFS 自动 rsync 已落地），但用户实测 SMB 手动挂载频繁半断（22:07 可写、22:08 即半断，mount 在但 touch 写不进），判定**极空间不稳定、不适合做备份，已弃用**。改 **方案 1 = 本地外置 SSD**（用户决策 22:1x，待插盘实施）
+  - **方案 1 外置 SSD（待实施）**：三星 T7 Shield / 闪迪 Extreme 1TB 级外置盘，USB/雷电直连 Mac，作 vault 第 3 副本。脚本 `~/.workbuddy/scripts/sync_jizone.sh` 目标检测改为「外置 SSD 卷优先」，launchd 定时任务 `~/Library/LaunchAgents/com.lzg.jizone-sync.plist`（每天 23:00）不变。已有 rsync 参数 `-aW --inplace --delete --timeout=60`、排除 `.git`/`.DS_Store`/`._*`、可写预检 3 次重试等逻辑全部复用，仅改目标路径检测。插盘后用户告知卷名（或我 `ls /Volumes` 探测），再改脚本并实测一次
+  - 3-2-1 拓扑维持：副本1 Mac 本地（Obsidian 工作副本）/ 副本2 GitHub 云（异地版本化）/ 副本3 外置 SSD（本地独立磁盘，物理直连不会"半断"）
+  - ⚠️ 极空间阶段经验教训（仍适用后续备份）：① 沙盒 Write 出的 plist 带 `com.apple.provenance` 致 launchctl EIO → 须非沙盒进程重写 plist；② 新版 macOS `launchctl load` 已移除 → 用 `launchctl bootstrap gui/$(id -u)`；③ rsync 对网络盘须 `-aW --inplace` 防 `renameat: Input/output error`
+- **当前状态（2026-07-13 22:1x）**：跨工具数据环路全面打通（① 龙虾产出→GitHub→Obsidian 自动拉取 ✅；② Codex 加工写回 vault ✅；③ Obsidian Git 备份上云 ✅；④ 龙虾读回 Codex 观点 ✅）。第 3 备份：极空间方案已落地但因稳定性弃用，改 **方案 1 外置 SSD**（待用户插盘后改脚本目标，launchd 定时任务不变）。后续可升级：GitHub 只读镜像版本化（可选）。
+- **知识库自生长状态分层（2026-07-13 22:3x，方案B已实施）**：吸取卡帕西自生长知识库方法（A原始→B概念→C方法→D输出→回流；Codex 五维检查：相关性/新鲜度/价值度/可输出性/关联性）。在主题区内加状态分层：`💰金融/` 与 `🤖AI/` 下各新增 `01_Sources/02_Knowledge/03_Topics/04_Outputs/05_Review/`（🤖AI 多 `06_Skills/`），各含 README 说明归位逻辑与关联。Codex 回流指令模板升级为「自生长版」：除原 `Codex观点-日期.md` 三段外，新增从简报抽 2-5 个原子概念卡片写到 `02_Knowledge/概念名.md`（含五维评估+双向链接，同名则更新）。新增 WorkBuddy 定时任务「知识库自生长 - Inbox消化 & 概念提炼」(id=automation-1783953311601，每周日 21:00 ACTIVE)：读 Inbox+💰金融/自动/ → 归档/提炼卡片；护栏：保留 frontmatter/双链/标签，不改 Home/MOC。⚠️ Claudian 插件方案不适用（用户用 ChatGPT 内置 Codex 而非独立 Codex CLI），走文件系统直连；龙虾 7×24 简报已替代文档的 GitHub Horizon 抓取
